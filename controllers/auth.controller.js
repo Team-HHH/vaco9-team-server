@@ -3,6 +3,46 @@ const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 const Advertiser = require('../models/Advertiser');
 
+exports.register = async function (req, res, next) {
+  const {
+    email,
+    name,
+    password,
+    companyName,
+    companyEmail,
+    companyRegistrationNumber,
+  } = req.bidy;
+
+  try {
+    const isVaildEmail = await Advertiser.exists({ email });
+    const isValidCompanyName = await Advertiser.exists({ companyName });
+    const isValidCompanyEmail = await Advertiser.exists({ companyEmail });
+    const isValidCompanyRegistrationNumber = await Advertiser.exists({ companyRegistrationNumber });
+
+    if (!(isVaildEmail && isValidCompanyName && isValidCompanyEmail && isValidCompanyRegistrationNumber)) {
+      return next(createError(400));
+    }
+
+    const hashedPassword = await argon2.hash(password);
+
+    await Advertiser.create({
+      email,
+      name,
+      password: hashedPassword,
+      companyName,
+      companyEmail,
+      companyRegistrationNumber,
+    });
+
+    res.json({
+      code: 200,
+      message: 'register success',
+    });
+  } catch (err) {
+    next(createError(500, err));
+  }
+};
+
 exports.login = async function (req, res, next) {
   const { email, password } = req.body;
 
