@@ -4,25 +4,21 @@ const createError = require('http-errors');
 const Advertiser = require('../models/Advertiser');
 
 exports.register = async function (req, res, next) {
-  const {
-    email,
-    name,
-    password,
-    companyName,
-    companyEmail,
-    companyRegistrationNumber,
-  } = req.bidy;
-
   try {
-    const isVaildEmail = await Advertiser.exists({ email });
-    const isValidCompanyName = await Advertiser.exists({ companyName });
-    const isValidCompanyEmail = await Advertiser.exists({ companyEmail });
-    const isValidCompanyRegistrationNumber = await Advertiser.exists({ companyRegistrationNumber });
+    const isExistAdvertiser = await Advertiser.checkIsAdvertiserExist(req.body);
 
-    if (!(isVaildEmail && isValidCompanyName && isValidCompanyEmail && isValidCompanyRegistrationNumber)) {
+    if (isExistAdvertiser) {
       return next(createError(400));
     }
 
+    const {
+      email,
+      name,
+      password,
+      companyName,
+      companyEmail,
+      companyRegistrationNumber,
+    } = req.body;
     const hashedPassword = await argon2.hash(password);
 
     await Advertiser.create({
