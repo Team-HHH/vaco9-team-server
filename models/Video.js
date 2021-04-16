@@ -1,17 +1,16 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
-  email: {
+const videoSchema = new mongoose.Schema({
+  bodyPart: {
     type: String,
     unique: true,
     trim: true,
     required: true,
   },
-  name: {
+  urls: [{
     type: String,
     trim: true,
-    required: true,
-  },
+  }],
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Video', videoSchema);
