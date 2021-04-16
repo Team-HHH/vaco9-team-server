@@ -31,8 +31,9 @@ const advertiserSchema = new mongoose.Schema({
     required: true,
   },
   companyRegistrationNumber: {
-    type: Number,
+    type: String,
     unique: true,
+    trim: true,
     required: true,
   },
   campaigns: [{

@@ -43,7 +43,11 @@ const campaignSchema = new mongoose.Schema({
     enum: ['card', 'trans', 'phone'],
   },
   stats: [{
-    date: { type: Date },
+    date: {
+      type: Date,
+      index: true,
+      required: true,
+    },
     reach: {
       type: Number,
       default: 0,
