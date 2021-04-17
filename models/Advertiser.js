@@ -42,4 +42,8 @@ const advertiserSchema = new mongoose.Schema({
   }],
 });
 
+advertiserSchema.statics.checkIsAdvertiserExist =  function ({ email, companyName, companyEmail, companyRegistrationNumber }) {
+  return this.exists({ $or: [{ email }, { companyName }, { companyEmail }, { companyRegistrationNumber }] });
+};
+
 module.exports = mongoose.model('Advertiser', advertiserSchema);
