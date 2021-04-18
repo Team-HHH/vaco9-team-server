@@ -1,11 +1,11 @@
 const createError = require('http-errors');
 const axios = require('axios');
-const Campaign = require('../models/Advertiser');
+const Campaign = require('../models/Campaign');
 
 exports.verifyPayment = async function (req, res, next) {
   try {
     const { imp_uid, merchant_uid } = req.body;
-    const currentCampaign = Campaign.findById(merchant_uid);
+    const currentCampaign = await Campaign.findById(merchant_uid);
     const amountToBePaid = currentCampaign.dailyBudget;
 
     const getToken = await axios({
@@ -30,11 +30,8 @@ exports.verifyPayment = async function (req, res, next) {
     const { amount, status } = paymentData;
 
     if (amount === amountToBePaid) {
-      // expiresAt이 오늘보다 뒤인지 확인이 필요함
       await Campaign.findByIdAndUpdate(merchant_uid, { status: 'opened' });
 
-      // 클라이언트에 리턴 줘야함.
-      // status가 paid 말고 ready 같은것도 존재할 수 있는지 확인이 필요힘
       if (status === 'paid') {
         res.json({
           code: 200,
@@ -42,9 +39,8 @@ exports.verifyPayment = async function (req, res, next) {
         });
       }
     } else {
-      console.log('결제정보 다름. 위/변조된 결제임.');
+      next(createError(400));
     }
-
   } catch (err) {
     next(createError(500, err));
   }

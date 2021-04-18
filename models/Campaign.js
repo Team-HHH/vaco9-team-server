@@ -10,7 +10,7 @@ const campaignSchema = new mongoose.Schema({
     trim: true,
     required: true,
   },
-  type: {
+  campaignType: {
     type: String,
     trim: true,
     enum: ['banner', 'text', 'video'],
@@ -19,6 +19,12 @@ const campaignSchema = new mongoose.Schema({
   content: {
     type: String,
     trim: true,
+    required: true,
+  },
+  expiresType: {
+    type: String,
+    trim: true,
+    enum: ['continue', 'expired'],
     required: true,
   },
   expiresAt: {
@@ -40,6 +46,7 @@ const campaignSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     enum: ['card', 'trans', 'phone'],
+    default: 'card',
   },
   stats: [{
     date: {
