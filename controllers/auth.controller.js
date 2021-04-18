@@ -65,10 +65,10 @@ exports.login = async function (req, res, next) {
           { expiresIn: '5H' },
         ),
         user: {
-          email: "ykh@naver.com",
-          name: "유경호",
-          companyName: "바닐라코딩",
-          companyEmail: "https://www.vanillacoding.co/",
+          email: currentAdvertiser.email,
+          name: currentAdvertiser.name,
+          companyName: currentAdvertiser.companyName,
+          companyEmail: currentAdvertiser.companyEmail,
         },
       },
     });
