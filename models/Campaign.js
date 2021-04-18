@@ -21,14 +21,14 @@ const campaignSchema = new mongoose.Schema({
     trim: true,
     required: true,
   },
-  expires_at: {
+  expiresAt: {
     type: Date,
   },
-  daily_budget: {
+  dailyBudget: {
     type: Number,
     required: true,
   },
-  remaining_budget: {
+  remainingBudget: {
     type: Number,
     required: true,
   },
@@ -37,7 +37,7 @@ const campaignSchema = new mongoose.Schema({
     enum: ['opened', 'closed', 'pending'],
     default: 'pending',
   },
-  payment_method: {
+  paymentMethod: {
     type: String,
     enum: ['card', 'trans', 'phone'],
   },
@@ -62,7 +62,7 @@ const campaignSchema = new mongoose.Schema({
 });
 
 campaignSchema.pre('save', function (next) {
-  this.remaining_budget = this.get('daily_budget');
+  this.remainingBudget = this.get('dailyBudget');
   next();
 });
 
