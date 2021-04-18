@@ -1,15 +1,19 @@
 const createError = require('http-errors');
-const Campaign = require('../models/Advertiser');
+const Campaign = require('../models/Campaign');
 
 exports.createCampaign = async function (req, res, next) {
   try {
-    const { title, type, content, expiresAt, dailyBudget } = req.body;
+    const { title, campaignType, expiresType, content, expiresAt, dailyBudget } = req.body;
+    const remainingBudget = dailyBudget;
+
     const newCampaign = await Campaign.create({
       title,
-      type,
+      campaignType,
+      expiresType,
       content,
       expiresAt,
       dailyBudget,
+      remainingBudget,
     });
 
     res.json({
