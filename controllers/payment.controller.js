@@ -1,12 +1,16 @@
 const createError = require('http-errors');
 const axios = require('axios');
+const { differenceInCalendarDays } = require('date-fns');
 const Campaign = require('../models/Campaign');
 
 exports.verifyPayment = async function (req, res, next) {
   try {
     const { imp_uid, merchant_uid } = req.body;
     const currentCampaign = await Campaign.findById(merchant_uid);
-    const amountToBePaid = currentCampaign.dailyBudget;
+    const campaignDuration = differenceInCalendarDays(currentCampaign.expiresAt, new Date());
+    const amountToBePaid = currentCampaign.dailyBudget * campaignDuration;
+
+    console.log(amountToBePaid);
 
     const getToken = await axios({
       url: 'https://api.iamport.kr/users/getToken',
@@ -15,7 +19,7 @@ exports.verifyPayment = async function (req, res, next) {
       data: {
         imp_key: process.env.IMPORT_REST_API,
         imp_secret: process.env.IMPORT_REST_API_SECRET,
-      }
+      },
     });
 
     const { access_token } = getToken.data.response;
