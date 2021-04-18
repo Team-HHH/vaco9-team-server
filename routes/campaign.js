@@ -1,10 +1,10 @@
 const express = require('express');
-const campaignsController = require('../controllers/campaigns.controller');
+const campaignController = require('../controllers/campaign.controller');
 
 const router = express.Router();
 
 router.get('/:advertiserId');
 router.get('/popup');
-router.post('/campaigns');
+router.post('/', campaignController.createCampaign);
 
 module.exports = router;

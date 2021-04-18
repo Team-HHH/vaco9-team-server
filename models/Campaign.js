@@ -34,9 +34,8 @@ const campaignSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['opened', 'closed'],
-    default: 'opened',
-    required: true,
+    enum: ['opened', 'closed', 'pending'],
+    default: 'pending',
   },
   payment_method: {
     type: String,
@@ -46,7 +45,6 @@ const campaignSchema = new mongoose.Schema({
     date: {
       type: Date,
       index: true,
-      required: true,
     },
     reach: {
       type: Number,
@@ -61,6 +59,11 @@ const campaignSchema = new mongoose.Schema({
       default: 0,
     },
   }],
+});
+
+campaignSchema.pre('save', function (next) {
+  this.remaining_budget = this.get('daily_budget');
+  next();
 });
 
 module.exports = mongoose.model('Campaign', campaignSchema);
