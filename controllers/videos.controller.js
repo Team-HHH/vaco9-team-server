@@ -1,20 +1,15 @@
-const Video = require('../models/Video');
 const createError = require('http-errors');
+const Video = require('../models/Video');
 
 exports.video = async function (req, res, next) {
-  const { bodyPart } = req.body;
-
   try {
-    const videoList = await Video.findOne(
-      { bodyPart },
-      { urls: 1 }
-    );
+    const videos = await Video.find();
 
     res.json({
       code: 200,
       message: 'success',
       data: {
-        videoList,
+        videos,
       },
     });
   } catch (err) {
