@@ -32,21 +32,19 @@ exports.createCampaign = async function (req, res, next) {
 exports.getAdvertiserCampaigns = async function (req, res, next) {
   try {
     const advertiserId = req.params.advertiserId;
-    const advertiser = await Advertiser.findById(advertiserId);
-
-    if (!advertiser) {
-      return next(createError(401));
-    }
-
-    const advertiserCampaigns = await Advertiser
+    const advertiser = await Advertiser
       .findOne({ _id: advertiserId })
       .populate('campaigns');
 
+    if (!advertiser) {
+      return next(createError(400));
+    }
+
     res.json({
       code: 200,
-      message: 'success',
+      message: 'success campaign',
       data: {
-        campaigns: advertiserCampaigns,
+        campaigns: advertiser.campaigns,
       },
     });
   } catch (error) {
