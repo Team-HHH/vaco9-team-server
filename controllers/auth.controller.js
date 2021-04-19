@@ -64,6 +64,12 @@ exports.login = async function (req, res, next) {
           process.env.JWT_SECRET,
           { expiresIn: '5H' },
         ),
+        user: {
+          email: currentAdvertiser.email,
+          name: currentAdvertiser.name,
+          companyName: currentAdvertiser.companyName,
+          companyEmail: currentAdvertiser.companyEmail,
+        },
       },
     });
   } catch (err) {
