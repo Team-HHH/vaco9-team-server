@@ -4,7 +4,7 @@ const campaignController = require('../controllers/campaign.controller');
 const router = express.Router();
 
 router.get('/:advertiserId', campaignController.getAdvertiserCampaigns);
-router.get('/popup');
+router.get('/popup', campaignController.getCampaignPopUp);
 router.post('/', campaignController.createCampaign);
 
 module.exports = router;
