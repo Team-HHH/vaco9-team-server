@@ -94,6 +94,12 @@ exports.updateCampaignStats = async function (req, res, next) {
   try {
     const { campaignId, type } = req.body;
 
+    if (type === 'reach') {
+      await Campaign.addReachCount(campaignId);
+    } else {
+      await Campaign.addClickCount(campaignId);
+    }
+
     res.json({
       code: 200,
       message: 'update campaign stats success',

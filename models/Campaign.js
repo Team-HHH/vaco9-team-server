@@ -68,6 +68,20 @@ const campaignSchema = new mongoose.Schema({
   }],
 });
 
+campaignSchema.statics.addReachCount = function (id) {
+  return this.findByIdAndUpdate(
+    id,
+    { $inc: { 'stats.$.reach': 1 } }
+  );
+};
+
+campaignSchema.statics.addClickCount = function (id) {
+  return this.findByIdAndUpdate(
+    id,
+    { $inc: { 'stats.$.click': 1 } }
+  );
+};
+
 campaignSchema.pre('save', function (next) {
   this.remainingBudget = this.get('dailyBudget');
   next();
