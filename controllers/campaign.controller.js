@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const { formatISO, parseISO, addHours } = require('date-fns');
 const Campaign = require('../models/Campaign');
 const Advertiser = require('../models/Advertiser');
 const getRandomIntInclusive = require('../utils');
@@ -96,8 +97,10 @@ exports.updateCampaignStats = async function (req, res, next) {
 
     if (type === 'reach') {
       await Campaign.addReachCount(campaignId);
-    } else {
+    } else if (type === 'click') {
       await Campaign.addClickCount(campaignId);
+    } else {
+      return next(createError(400));
     }
 
     res.json({
