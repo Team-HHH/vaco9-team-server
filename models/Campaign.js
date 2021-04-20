@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { endOfDay, startOfDay } = require('date-fns');
 
 const campaignSchema = new mongoose.Schema({
   advertiser: {
@@ -67,6 +68,57 @@ const campaignSchema = new mongoose.Schema({
     },
   }],
 });
+
+campaignSchema.statics.addStatsIfDoesNotExist = async function (id, date) {
+  const isTodayStatsExist = await this.exists({
+    _id: id,
+    'stats.date': {
+      $gte: startOfDay(date),
+      $lte: endOfDay(date)
+    }
+  });
+
+  if (!isTodayStatsExist) {
+    return this.findByIdAndUpdate(
+      id,
+      { $addToSet: { stats: { date: date } } }
+    );
+  }
+};
+
+campaignSchema.statics.addReachCount = async function (id) {
+  const today = new Date();
+
+  await this.addStatsIfDoesNotExist(id, today);
+
+  return this.findOneAndUpdate(
+    {
+      _id: id,
+      'stats.date': {
+        $gte: startOfDay(today),
+        $lte: endOfDay(today)
+      }
+    },
+    { $inc: { 'stats.$.reach': 1 } }
+  );
+};
+
+campaignSchema.statics.addClickCount = async function (id) {
+  const today = new Date();
+
+  await this.addStatsIfDoesNotExist(id, today);
+
+  return this.findOneAndUpdate(
+    {
+      _id: id,
+      'stats.date': {
+        $gte: startOfDay(today),
+        $lte: endOfDay(today)
+      }
+    },
+    { $inc: { 'stats.$.click': 1 } }
+  );
+};
 
 campaignSchema.pre('save', function (next) {
   this.remainingBudget = this.get('dailyBudget');

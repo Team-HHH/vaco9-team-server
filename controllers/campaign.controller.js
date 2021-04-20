@@ -90,6 +90,27 @@ exports.getCampaignPopUp = async function (req, res, next) {
   }
 };
 
+exports.updateCampaignStats = async function (req, res, next) {
+  try {
+    const { campaignId, type } = req.body;
+
+    if (type === 'reach') {
+      await Campaign.addReachCount(campaignId);
+    } else if (type === 'click') {
+      await Campaign.addClickCount(campaignId);
+    } else {
+      return next(createError(400));
+    }
+
+    res.json({
+      code: 200,
+      message: 'update campaign stats success',
+    });
+  } catch (error) {
+    next(createError(500, error));
+  }
+};
+
 function getRandomCampaign(campaigns) {
   const randomCampaignIndex = Math.floor(Math.random() * campaigns.length);
 
