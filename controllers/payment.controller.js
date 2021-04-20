@@ -10,8 +10,6 @@ exports.verifyPayment = async function (req, res, next) {
     const campaignDuration = differenceInCalendarDays(currentCampaign.expiresAt, new Date());
     const amountToBePaid = currentCampaign.dailyBudget * campaignDuration;
 
-    console.log(amountToBePaid);
-
     const getToken = await axios({
       url: 'https://api.iamport.kr/users/getToken',
       method: 'post',
