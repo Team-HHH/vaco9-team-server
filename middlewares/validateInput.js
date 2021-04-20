@@ -4,6 +4,7 @@ const {
   advertiserRegisterErrorMessage,
   createCampaignErrorMessage,
   paymentErrorMessage,
+  campaignStatsErrorMessage,
 } = require('../constants/joiErrorMessage');
 
 exports.advertiserRegisterValidation = function (req, res, next) {
@@ -43,7 +44,7 @@ exports.advertiserRegisterValidation = function (req, res, next) {
   validateRequest(req, res, next, schema);
 };
 
-exports.loginValidation = function (req, res, next) {
+exports.advertiserLoginValidation = function (req, res, next) {
   const schema = Joi.object({
     email: Joi.string()
       .email()
@@ -103,6 +104,13 @@ exports.paymentValidation = function (req, res, next) {
 
 exports.campaignStatsValidation = function (req, res, next) {
   const schema = Joi.object({
+    campaignId: Joi.string()
+      .required()
+      .error(new Error(campaignStatsErrorMessage.INVALID_CAMPAIGNID)),
+    type: Joi.string()
+      .valid('reach', 'click')
+      .required()
+      .error(new Error(campaignStatsErrorMessage.INVALID_TYPE)),
   });
 
   validateRequest(req, res, next, schema);

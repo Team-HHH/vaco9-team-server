@@ -13,8 +13,8 @@ exports.advertiserRegisterErrorMessage = Object.freeze({
 
 exports.createCampaignErrorMessage = Object.freeze({
   INVALID_TITLE: 'Title is invalid',
-  INVALID_CAMPAIGNTYPE: 'Campaign type is invalid',
-  INVALID_EXPIRESTYPE: 'Expires type is invalid',
+  INVALID_CAMPAIGNTYPE: 'Campaign type must be [banner, text, video]',
+  INVALID_EXPIRESTYPE: 'Expires type must be [continue, expired]',
   INVALID_CONTENT: 'Content is invalid',
   INVALID_EXPIRESAT: 'ExpiresAt is invalid',
   INVALID_DAILYBUDGET: 'Daily budget is invalid',
@@ -23,4 +23,9 @@ exports.createCampaignErrorMessage = Object.freeze({
 exports.paymentErrorMessage = Object.freeze({
   INVALID_IMP_UID: 'Imp_uid is necessary value',
   INVALID_MERCHANT_UID: 'Merchant_uid is necessary value',
+});
+
+exports.campaignStatsErrorMessage = Object.freeze({
+  INVALID_CAMPAIGNID: 'Campaign is necessary value',
+  INVALID_TYPE: 'Type must be [reach, click]',
 });
