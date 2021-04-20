@@ -2,6 +2,8 @@ const Joi = require('joi');
 const {
   commonErrorMessage,
   advertiserRegisterErrorMessage,
+  createCampaignErrorMessage,
+  paymentErrorMessage,
 } = require('../constants/joiErrorMessage');
 
 exports.advertiserRegisterValidation = function (req, res, next) {
@@ -62,25 +64,25 @@ exports.createCampaignValidation = function (req, res, next) {
   const schema = Joi.object({
     title: Joi.string()
       .required()
-      .error(new Error()),
+      .error(new Error(createCampaignErrorMessage.INVALID_TITLE)),
     campaignType: Joi.string()
       .valid('banner', 'text', 'video')
       .required()
-      .error(new Error()),
+      .error(new Error(createCampaignErrorMessage.INVALID_CAMPAIGNTYPE)),
     expiresType: Joi.string
       .valid('continue', 'expired')
       .required()
-      .error(new Error()),
+      .error(new Error(createCampaignErrorMessage.INVALID_EXPIRESTYPE)),
     content: Joi.string()
       .required()
-      .error(new Error()),
+      .error(new Error(createCampaignErrorMessage.INVALID_CONTENT)),
     expiresAt: Joi.date()
       .greater('now')
       .required()
-      .error(new Error()),
+      .error(new Error(createCampaignErrorMessage.INVALID_EXPIRESAT)),
     dailyBudget: Joi.number()
       .required()
-      .error(new Error()),
+      .error(new Error(createCampaignErrorMessage.INVALID_DAILYBUDGET)),
   });
 
   validateRequest(req, res, next, schema);
@@ -88,6 +90,12 @@ exports.createCampaignValidation = function (req, res, next) {
 
 exports.paymentValidation = function (req, res, next) {
   const schema = Joi.object({
+    imp_uid: Joi.string()
+      .required()
+      .error(new Error(paymentErrorMessage.INVALID_MP_UID)),
+    merchant_uid: Joi.string()
+      .required()
+      .error(new Error(paymentErrorMessage.INVALID_MERCHANT_UID)),
   });
 
   validateRequest(req, res, next, schema);
