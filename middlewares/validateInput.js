@@ -1,15 +1,15 @@
 const Joi = require('joi');
 const {
+  commonErrorMessage,
   advertiserRegisterErrorMessage,
 } = require('../constants/joiErrorMessage');
-const { getErrorMessage } = require('../utils');
 
 exports.advertiserRegisterValidation = function (req, res, next) {
   const schema = Joi.object({
     email: Joi.string()
       .email()
       .required()
-      .error(new Error(advertiserRegisterErrorMessage.INVALID_EMAIL)),
+      .error(new Error(commonErrorMessage.INVALID_EMAIL)),
     name: Joi.string()
       .required()
       .error(new Error(advertiserRegisterErrorMessage.INVALID_NAME)),
@@ -18,7 +18,7 @@ exports.advertiserRegisterValidation = function (req, res, next) {
       .max(20)
       .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])'))
       .required()
-      .error(new Error(advertiserRegisterErrorMessage.INVALID_PASSWORD)),
+      .error(new Error(commonErrorMessage.INVALID_PASSWORD)),
     passwordConfirm: Joi.string()
       .min(8)
       .max(20)
@@ -43,6 +43,16 @@ exports.advertiserRegisterValidation = function (req, res, next) {
 
 exports.loginValidation = function (req, res, next) {
   const schema = Joi.object({
+    email: Joi.string()
+      .email()
+      .required()
+      .error(new Error(commonErrorMessage.INVALID_EMAIL)),
+    password: Joi.string()
+      .min(8)
+      .max(20)
+      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])'))
+      .required()
+      .error(new Error(commonErrorMessage.INVALID_PASSWORD)),
   });
 
   validateRequest(req, res, next, schema);
@@ -79,10 +89,10 @@ async function validateRequest(req, res, next, schema) {
     await schema.validateAsync(req.body, options);
 
     next();
-  } catch (err) {
+  } catch (error) {
     res.json({
       code: 400,
-      message: getErrorMessage(err),
+      message: error.message,
     });
   }
 }
