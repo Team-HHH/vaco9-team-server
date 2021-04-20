@@ -60,6 +60,27 @@ exports.loginValidation = function (req, res, next) {
 
 exports.createCampaignValidation = function (req, res, next) {
   const schema = Joi.object({
+    title: Joi.string()
+      .required()
+      .error(new Error()),
+    campaignType: Joi.string()
+      .valid('banner', 'text', 'video')
+      .required()
+      .error(new Error()),
+    expiresType: Joi.string
+      .valid('continue', 'expired')
+      .required()
+      .error(new Error()),
+    content: Joi.string()
+      .required()
+      .error(new Error()),
+    expiresAt: Joi.date()
+      .greater('now')
+      .required()
+      .error(new Error()),
+    dailyBudget: Joi.number()
+      .required()
+      .error(new Error()),
   });
 
   validateRequest(req, res, next, schema);
