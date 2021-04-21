@@ -18,6 +18,11 @@ exports.createCampaign = async function (req, res, next) {
       remainingBudget,
     });
 
+    await Advertiser.findByIdAndUpdate(
+      req.advertiserId,
+      { $addToSet: { campaigns: newCampaign._id } }
+    );
+
     res.json({
       code: 200,
       message: 'create campaign success',
@@ -32,10 +37,10 @@ exports.createCampaign = async function (req, res, next) {
 
 exports.getAdvertiserCampaigns = async function (req, res, next) {
   try {
-    const advertiserId = req.params.advertiserId;
     const advertiser = await Advertiser
-      .findOne({ _id: advertiserId })
-      .populate('campaigns');
+      .findById(req.advertiserId)
+      .populate('campaigns')
+      .lean();
 
     if (!advertiser) {
       return next(createError(400));
