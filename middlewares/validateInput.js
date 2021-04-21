@@ -70,7 +70,7 @@ exports.createCampaignValidation = function (req, res, next) {
       .valid('banner', 'text', 'video')
       .required()
       .error(new Error(createCampaignErrorMessage.INVALID_CAMPAIGNTYPE)),
-    expiresType: Joi.string
+    expiresType: Joi.string()
       .valid('continue', 'expired')
       .required()
       .error(new Error(createCampaignErrorMessage.INVALID_EXPIRESTYPE)),
