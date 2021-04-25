@@ -39,6 +39,10 @@ const campaignSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  campaignUrl: {
+    type: String,
+    required: true,
+  },
   status: {
     type: String,
     enum: ['opened', 'closed', 'pending'],

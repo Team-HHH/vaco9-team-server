@@ -5,7 +5,7 @@ const getRandomIntInclusive = require('../utils');
 
 exports.createCampaign = async function (req, res, next) {
   try {
-    const { title, campaignType, expiresType, content, expiresAt, dailyBudget } = req.body;
+    const { title, campaignType, expiresType, content, expiresAt, dailyBudget, campaignUrl, } = req.body;
     const remainingBudget = dailyBudget;
 
     const newCampaign = await Campaign.create({
@@ -16,6 +16,7 @@ exports.createCampaign = async function (req, res, next) {
       expiresAt,
       dailyBudget,
       remainingBudget,
+      campaignUrl,
     });
 
     await Advertiser.findByIdAndUpdate(
