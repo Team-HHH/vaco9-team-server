@@ -81,7 +81,7 @@ exports.getCampaignPopUp = async function (req, res, next) {
       { $inc: { remainingBudget: -randomCost, }, }
     );
 
-    const { _id, content, } = pickedCampaign;
+    const { _id, content, campaignUrl, } = pickedCampaign;
 
     res.json({
       code: 200,
@@ -89,6 +89,7 @@ exports.getCampaignPopUp = async function (req, res, next) {
       data: {
         campaignId: _id,
         content,
+        campaignUrl,
       },
     });
   } catch (err) {
