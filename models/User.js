@@ -12,6 +12,21 @@ const userSchema = new mongoose.Schema({
     trim: true,
     required: true,
   },
+  password: {
+    type: String,
+    minLength: 8,
+    trim: true,
+    required: true,
+  },
+  paymentState: {
+    type: String,
+    trim: true,
+    enum: [''],
+  },
 });
+
+userSchema.statics.checkIsUserExist =  function ({ email }) {
+  return this.exists({ email });
+};
 
 module.exports = mongoose.model('User', userSchema);

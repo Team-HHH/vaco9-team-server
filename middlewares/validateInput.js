@@ -84,6 +84,9 @@ exports.createCampaignValidation = function (req, res, next) {
     dailyBudget: Joi.number()
       .required()
       .error(new Error(createCampaignErrorMessage.INVALID_DAILYBUDGET)),
+    campaignUrl: Joi.string()
+      .required()
+      .error(new Error(createCampaignErrorMessage.INVALID_CAMPAIGNURL)),
   });
 
   validateRequest(req, res, next, schema);

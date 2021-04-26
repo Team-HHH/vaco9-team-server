@@ -18,6 +18,7 @@ exports.createCampaignErrorMessage = Object.freeze({
   INVALID_CONTENT: 'Content is invalid',
   INVALID_EXPIRESAT: 'ExpiresAt is invalid',
   INVALID_DAILYBUDGET: 'Daily budget is invalid',
+  INVALID_CAMPAIGNURL: 'Campaign URL is invalid',
 });
 
 exports.paymentErrorMessage = Object.freeze({
