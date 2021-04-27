@@ -29,8 +29,10 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({
-    code: res.status,
-    message: statuses[res.status],
+    code: err.status,
+    message: err.message !== statuses[err.status]
+      ? err.message
+      : statuses[err.status],
   });
 });
 

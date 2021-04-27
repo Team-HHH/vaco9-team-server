@@ -3,6 +3,8 @@ const Campaign = require('../models/Campaign');
 const Advertiser = require('../models/Advertiser');
 const getRandomIntInclusive = require('../utils');
 
+const { campaignErrorMessage } = require('../constants/controllerErrorMessage');
+
 exports.createCampaign = async function (req, res, next) {
   try {
     const { title, campaignType, expiresType, content, expiresAt, dailyBudget, campaignUrl, } = req.body;
@@ -44,7 +46,7 @@ exports.getAdvertiserCampaigns = async function (req, res, next) {
       .lean();
 
     if (!advertiser) {
-      return next(createError(400));
+      return next(createError(400), campaignErrorMessage.NONEXISTENT_ADVERTISER_ERROR);
     }
 
     res.json({
@@ -105,8 +107,6 @@ exports.updateCampaignStats = async function (req, res, next) {
       await Campaign.addReachCount(campaignId);
     } else if (type === 'click') {
       await Campaign.addClickCount(campaignId);
-    } else {
-      return next(createError(400));
     }
 
     res.json({

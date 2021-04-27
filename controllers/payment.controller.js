@@ -3,6 +3,8 @@ const axios = require('axios');
 const { differenceInCalendarDays } = require('date-fns');
 const Campaign = require('../models/Campaign');
 
+const { paymentErrorMessage } = require('../constants/controllerErrorMessage');
+
 exports.verifyPayment = async function (req, res, next) {
   try {
     const { imp_uid, merchant_uid } = req.body;
@@ -41,7 +43,7 @@ exports.verifyPayment = async function (req, res, next) {
         });
       }
     } else {
-      next(createError(400));
+      next(createError(400, paymentErrorMessage.FAILED_TO_PAY_ERROR));
     }
   } catch (err) {
     next(createError(500, err));

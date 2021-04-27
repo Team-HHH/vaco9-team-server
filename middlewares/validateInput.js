@@ -130,7 +130,7 @@ async function validateRequest(req, res, next, schema) {
 
     next();
   } catch (error) {
-    res.json({
+    res.status(400).json({
       code: 400,
       message: error.message,
     });

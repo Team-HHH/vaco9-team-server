@@ -4,12 +4,14 @@ const createError = require('http-errors');
 const Advertiser = require('../models/Advertiser');
 const User = require('../models/User');
 
+const { authErrorMessage } = require('../constants/controllerErrorMessage');
+
 exports.register = async function (req, res, next) {
   try {
     const isExistAdvertiser = await Advertiser.checkIsAdvertiserExist(req.body);
 
     if (isExistAdvertiser) {
-      return next(createError(400));
+      return next(createError(400, authErrorMessage.ALREADY_EXIST_INFO_ERROR));
     }
 
     const {
@@ -47,13 +49,13 @@ exports.login = async function (req, res, next) {
     const currentAdvertiser = await Advertiser.findOne({ email }).lean();
 
     if (!currentAdvertiser) {
-      return next(createError(400));
+      return next(createError(400, authErrorMessage.NONEXISTENT_EMAIL_ERROR));
     }
 
     const isCorrectPassword = await argon2.verify(currentAdvertiser.password, password);
 
     if (!isCorrectPassword) {
-      return next(createError(401));
+      return next(createError(401, authErrorMessage.INCORRECT_PASSWORD_ERROR));
     }
 
     res.json({
@@ -79,20 +81,19 @@ exports.login = async function (req, res, next) {
 };
 
 exports.loginUser = async function (req, res, next) {
-  console.log(req.body)
   const { email, password } = req.body;
 
   try {
     const currentUser = await User.findOne({ email }).lean();
 
     if (!currentUser) {
-      return next(createError(400));
+      return next(createError(400), authErrorMessage.NONEXISTENT_EMAIL_ERROR);
     }
 
     const isCorrectPassword = await argon2.verify(currentUser.password, password);
 
     if (!isCorrectPassword) {
-      return next(createError(401));
+      return next(createError(401), authErrorMessage.INCORRECT_PASSWORD_ERROR);
     }
 
     res.json({
@@ -118,7 +119,7 @@ exports.registerUser = async function (req, res, next) {
     const isExistUser = await User.checkIsUserExist(req.body);
 
     if (isExistUser) {
-      return next(createError(400));
+      return next(createError(400), authErrorMessage.ALREADY_EXIST_EMAIL_ERROR);
     }
 
     const { email, password, name, } = req.body;
@@ -135,7 +136,6 @@ exports.registerUser = async function (req, res, next) {
       message: 'register success',
     });
   } catch (err) {
-    console.log(err.message)
     next(createError(500, err));
   }
 };
