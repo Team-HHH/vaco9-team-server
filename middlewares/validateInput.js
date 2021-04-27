@@ -44,23 +44,6 @@ exports.advertiserRegisterValidation = function (req, res, next) {
   validateRequest(req, res, next, schema);
 };
 
-exports.advertiserLoginValidation = function (req, res, next) {
-  const schema = Joi.object({
-    email: Joi.string()
-      .email()
-      .required()
-      .error(new Error(commonErrorMessage.INVALID_EMAIL)),
-    password: Joi.string()
-      .min(8)
-      .max(20)
-      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])'))
-      .required()
-      .error(new Error(commonErrorMessage.INVALID_PASSWORD)),
-  });
-
-  validateRequest(req, res, next, schema);
-};
-
 exports.userRegisterValidation = function (req, res, next) {
   const schema = Joi.object({
     email: Joi.string()
@@ -87,7 +70,7 @@ exports.userRegisterValidation = function (req, res, next) {
   validateRequest(req, res, next, schema);
 };
 
-exports.userLoginValidation = function (req, res, next) {
+exports.loginValidation = function (req, res, next) {
   const schema = Joi.object({
     email: Joi.string()
       .email()
