@@ -4,7 +4,10 @@ const createError = require('http-errors');
 const Advertiser = require('../models/Advertiser');
 const User = require('../models/User');
 
-const { authErrorMessage, ACCESS_TOKEN_EXPIRATION_TIME } = require('../constants/controllerErrorMessage');
+const {
+  authErrorMessage,
+  ACCESS_TOKEN_EXPIRATION_TIME
+} = require('../constants/controllerErrorMessage');
 const { authResponseMessage } = require('../constants/responseMessage');
 
 exports.register = async function (req, res, next) {
@@ -89,7 +92,7 @@ exports.registerUser = async function (req, res, next) {
       return next(createError(400), authErrorMessage.ALREADY_EXIST_EMAIL_ERROR);
     }
 
-    const { email, password, name, } = req.body;
+    const { email, password, name } = req.body;
     const hashedPassword = await argon2.hash(password);
 
     await User.create({

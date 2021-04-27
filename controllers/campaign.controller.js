@@ -8,7 +8,15 @@ const { campaignResponseMessage } = require('../constants/responseMessage');
 
 exports.createCampaign = async function (req, res, next) {
   try {
-    const { title, campaignType, expiresType, content, expiresAt, dailyBudget, campaignUrl, } = req.body;
+    const {
+      title,
+      campaignType,
+      expiresType,
+      content,
+      expiresAt,
+      dailyBudget,
+      campaignUrl
+    } = req.body;
     const remainingBudget = dailyBudget;
 
     const newCampaign = await Campaign.create({
@@ -84,7 +92,11 @@ exports.getCampaignPopUp = async function (req, res, next) {
       { $inc: { remainingBudget: -randomCost, }, }
     );
 
-    const { _id, content, campaignUrl, } = pickedCampaign;
+    const {
+      _id,
+      content,
+      campaignUrl
+    } = pickedCampaign;
 
     res.json({
       code: 200,
