@@ -4,7 +4,8 @@ const createError = require('http-errors');
 const Advertiser = require('../models/Advertiser');
 const User = require('../models/User');
 
-const { authErrorMessage } = require('../constants/controllerErrorMessage');
+const { authErrorMessage, ACCESS_TOKEN_EXPIRATION_TIME } = require('../constants/controllerErrorMessage');
+const { authResponseMessage } = require('../constants/responseMessage');
 
 exports.register = async function (req, res, next) {
   try {
@@ -35,7 +36,7 @@ exports.register = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'register success',
+      message: authResponseMessage.REGISTER_SUCCESS_RESPONSE,
     });
   } catch (err) {
     next(createError(500, err));
@@ -60,12 +61,12 @@ exports.login = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'login success',
+      message: authResponseMessage.LOGIN_SUCCESS_RESPONSE,
       data: {
         accessToken: jwt.sign(
           { id: currentAdvertiser._id },
           process.env.JWT_SECRET,
-          { expiresIn: '5H' }
+          { expiresIn: ACCESS_TOKEN_EXPIRATION_TIME }
         ),
         user: {
           email: currentAdvertiser.email,
@@ -98,12 +99,12 @@ exports.loginUser = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'login success',
+      message: authResponseMessage.LOGIN_SUCCESS_RESPONSE,
       data: {
         accessToken: jwt.sign(
           { id: currentUser._id },
           process.env.JWT_SECRET,
-          { expiresIn: '5H' }
+          { expiresIn: ACCESS_TOKEN_EXPIRATION_TIME }
         ),
         name: currentUser.name,
         paymentState: currentUser.paymentState,
@@ -133,7 +134,7 @@ exports.registerUser = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'register success',
+      message: authResponseMessage.REGISTER_SUCCESS_RESPONSE,
     });
   } catch (err) {
     next(createError(500, err));

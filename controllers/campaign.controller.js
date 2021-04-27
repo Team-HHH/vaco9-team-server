@@ -4,6 +4,7 @@ const Advertiser = require('../models/Advertiser');
 const getRandomIntInclusive = require('../utils');
 
 const { campaignErrorMessage } = require('../constants/controllerErrorMessage');
+const { campaignResponseMessage } = require('../constants/responseMessage');
 
 exports.createCampaign = async function (req, res, next) {
   try {
@@ -28,7 +29,7 @@ exports.createCampaign = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'create campaign success',
+      message: campaignResponseMessage.CREATE_CAMPAIGN_SUCCESS_RESPONSE,
       data: {
         merchantId: newCampaign._id,
       },
@@ -51,7 +52,7 @@ exports.getAdvertiserCampaigns = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'success campaign',
+      message: campaignResponseMessage.GET_CAMPAIGN_SUCCESS_RESPONSE,
       data: {
         campaigns: advertiser.campaigns,
       },
@@ -72,7 +73,7 @@ exports.getCampaignPopUp = async function (req, res, next) {
     if (!openedCampaigns.length) {
       return res.json({
         code: 200,
-        message: 'There are no campaign with remainingBudget left',
+        message: campaignResponseMessage.NO_CAMPAIGN_WITH_REMAININGBUDGET_LEFT_RESPONSE,
       });
     }
 
@@ -87,7 +88,7 @@ exports.getCampaignPopUp = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'success to get campaign pop-up',
+      message: campaignResponseMessage.GET_CAMPAIGN_POPUP_SUCCESS_RESPONSE,
       data: {
         campaignId: _id,
         content,
@@ -111,7 +112,7 @@ exports.updateCampaignStats = async function (req, res, next) {
 
     res.json({
       code: 200,
-      message: 'update campaign stats success',
+      message: campaignResponseMessage.UPDATE_CAMPAIGN_STATS_SUCCESS,
     });
   } catch (error) {
     next(createError(500, error));
