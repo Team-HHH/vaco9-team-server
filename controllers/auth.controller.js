@@ -81,6 +81,32 @@ exports.login = async function (req, res, next) {
   }
 };
 
+exports.registerUser = async function (req, res, next) {
+  try {
+    const isExistUser = await User.checkIsUserExist(req.body);
+
+    if (isExistUser) {
+      return next(createError(400), authErrorMessage.ALREADY_EXIST_EMAIL_ERROR);
+    }
+
+    const { email, password, name, } = req.body;
+    const hashedPassword = await argon2.hash(password);
+
+    await User.create({
+      email,
+      name,
+      password: hashedPassword,
+    });
+
+    res.json({
+      code: 200,
+      message: authResponseMessage.REGISTER_SUCCESS_RESPONSE,
+    });
+  } catch (err) {
+    next(createError(500, err));
+  }
+};
+
 exports.loginUser = async function (req, res, next) {
   const { email, password } = req.body;
 
@@ -109,32 +135,6 @@ exports.loginUser = async function (req, res, next) {
         name: currentUser.name,
         paymentState: currentUser.paymentState,
       },
-    });
-  } catch (err) {
-    next(createError(500, err));
-  }
-};
-
-exports.registerUser = async function (req, res, next) {
-  try {
-    const isExistUser = await User.checkIsUserExist(req.body);
-
-    if (isExistUser) {
-      return next(createError(400), authErrorMessage.ALREADY_EXIST_EMAIL_ERROR);
-    }
-
-    const { email, password, name, } = req.body;
-    const hashedPassword = await argon2.hash(password);
-
-    await User.create({
-      email,
-      name,
-      password: hashedPassword,
-    });
-
-    res.json({
-      code: 200,
-      message: authResponseMessage.REGISTER_SUCCESS_RESPONSE,
     });
   } catch (err) {
     next(createError(500, err));
