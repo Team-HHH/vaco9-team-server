@@ -178,7 +178,7 @@ campaignSchema.statics.addClickCount = async function (id, user) {
       }
     },
     {
-      $inc: { 'stats.$.reach': 1 },
+      $inc: { 'stats.$.click': 1 },
       $push: {
         age: user.age,
         gender: user.gender,

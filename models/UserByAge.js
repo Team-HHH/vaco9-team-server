@@ -18,23 +18,28 @@ const userByAgeSchema = new mongoose.Schema({
   },
   reach: {
     type: Number,
+    default: 0,
     required: true,
   },
   click: {
     type: Number,
+    default: 0,
     required: true,
   },
   usedBudget: {
     type: Number,
     default: 0,
+    required: true,
   },
   userCount: {
     type: Number,
     default: 0,
+    required: true,
   },
   targetedCount: {
     type: Number,
     default: 0,
+    required: true,
   },
 });
 
