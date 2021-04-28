@@ -4,6 +4,8 @@ const createError = require('http-errors');
 
 const Advertiser = require('../models/Advertiser');
 const User = require('../models/User');
+const UserByAge = require('../models/UserByAge');
+const UserStats = require('../models/UserStats');
 const { authErrorMessage } = require('../constants/controllerErrorMessage');
 const { authResponseMessage } = require('../constants/responseMessage');
 const { ACCESS_TOKEN_EXPIRATION_TIME } = require('../constants');
@@ -100,6 +102,19 @@ exports.registerUser = async function (req, res, next) {
       age,
       gender,
       country,
+    });
+
+    await UserStats.findOneAndUpdate({
+      country,
+    }, {
+      $inc: { countryUserCount: 1 }
+    });
+    await UserByAge.findOneAndUpdate({
+      country,
+      age,
+      gender,
+    }, {
+      $inc: { userCount: 1 },
     });
 
     res.json({

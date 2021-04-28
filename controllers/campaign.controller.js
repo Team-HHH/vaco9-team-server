@@ -5,7 +5,7 @@ const Advertiser = require('../models/Advertiser');
 const User = require('../models/User');
 const UserStats = require('../models/UserStats');
 const UserByAge = require('../models/UserByAge');
-const getRandomIntInclusive = require('../utils');
+const { getRandomIntInclusive, range } = require('../utils');
 const { campaignErrorMessage } = require('../constants/controllerErrorMessage');
 const { campaignResponseMessage } = require('../constants/responseMessage');
 
@@ -20,6 +20,24 @@ exports.createCampaign = async function (req, res, next) {
       req.id,
       { $addToSet: { campaigns: newCampaign._id } }
     );
+
+    await UserStats.findOneAndUpdate({
+      country: req.body.country,
+    }, {
+      $inc: { countryTargetedCount: 1 }
+    });
+
+    const promises = range(req.body.minAge, req.body.maxAge).map(age => {
+      return UserByAge.findOneAndUpdate({
+        country: req.body.country,
+        age: age,
+        gender: req.body.gender,
+      }, {
+        $inc: { targetedCount: 1 },
+      });
+    });
+
+    await Promise.all(promises);
 
     res.json({
       code: 200,
@@ -104,8 +122,22 @@ exports.updateCampaignStats = async function (req, res, next) {
     const currentUser = await User.findById(req.id);
 
     if (type === 'reach') {
+      await UserByAge.findOneAndUpdate({
+        country: currentUser.country,
+        age: currentUser.age,
+        gender: currentUser.gender,
+      }, {
+        $inc: { reach: 1 },
+      });
       await Campaign.addReachCount(campaignId, currentUser);
     } else if (type === 'click') {
+      await UserByAge.findOneAndUpdate({
+        country: currentUser.country,
+        age: currentUser.age,
+        gender: currentUser.gender,
+      }, {
+        $inc: { click: 1 },
+      });
       await Campaign.addClickCount(campaignId, currentUser);
     }
 
