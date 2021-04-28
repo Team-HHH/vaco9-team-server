@@ -1,6 +1,6 @@
 const createError = require('http-errors');
-const Video = require('../models/Video');
 
+const Video = require('../models/Video');
 const { videosResponseMessage } = require('../constants/responseMessage');
 
 exports.video = async function (req, res, next) {
