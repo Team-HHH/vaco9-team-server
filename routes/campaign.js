@@ -4,14 +4,14 @@ const {
   createCampaignValidation,
   campaignStatsValidation,
 } = require('../middlewares/validateInput');
-const { verifyAdvertiser } = require('../middlewares/verifyAdvertiser');
+const { verifyToken } = require('../middlewares/verifyToken');
 
 const router = express.Router();
 
-router.post('/', verifyAdvertiser, createCampaignValidation, campaignController.createCampaign);
-router.get('/', verifyAdvertiser, campaignController.getAdvertiserCampaigns);
-router.get('/popup', campaignController.getCampaignPopUp);
-router.patch('/stats', campaignStatsValidation, campaignController.updateCampaignStats);
-router.post('/estimate', campaignController.getEstimateStats);
+router.get('/', verifyToken, campaignController.getAdvertiserCampaigns);
+router.get('/popup', verifyToken, campaignController.getCampaignPopUp);
+router.post('/', verifyToken, createCampaignValidation, campaignController.createCampaign);
+router.post('/estimate', verifyToken, campaignController.getEstimateStats);
+router.patch('/stats', verifyToken, campaignStatsValidation, campaignController.updateCampaignStats);
 
 module.exports = router;
