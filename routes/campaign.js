@@ -12,5 +12,6 @@ router.post('/', verifyAdvertiser, createCampaignValidation, campaignController.
 router.get('/', verifyAdvertiser, campaignController.getAdvertiserCampaigns);
 router.get('/popup', campaignController.getCampaignPopUp);
 router.patch('/stats', campaignStatsValidation, campaignController.updateCampaignStats);
+router.post('/estimate', campaignController.getEstimateStats);
 
 module.exports = router;

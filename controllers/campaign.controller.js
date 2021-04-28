@@ -135,17 +135,34 @@ exports.updateCampaignStats = async function (req, res, next) {
 exports.getEstimateStats = async function (req, res, next) {
   try {
     const { minAge, maxAge, gender, country } = req.body;
+    console.log(minAge)
+    console.log(maxAge)
+    console.log(gender)
+    console.log(country)
 
-    const targets = UserStats.find({
-      country,
-      'stats.age': {
-        $lte: minAge,
-        $gte: maxAge,
-      },
-      'stats.gender': gender === 'both' ? { $or: ['male', 'female'] } : gender,
-    }).lean();
+    const targets = await UserStats.aggregate([
+      {
+        $match: {
+          country,
+          'stats.age': {
+            $lte: minAge,
+            $gte: maxAge,
+          },
+          'stats.gender': gender === 'both' ? { $or: ['male', 'female'] } : gender }
+      }
+    ]);
 
+    console.log(targets);
 
+    const { cpm, cpc } = targets.reduce((acc, cur) => {
+      acc.cpm += cur.cpm;
+      acc.cpc += cur.cpc;
+    }, {'cpm': 0, 'cpc': 0});
+
+    res.json({
+      cpm,
+      cpc
+    });
   } catch (error) {
     next(createError(500, error));
   }
