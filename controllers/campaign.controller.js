@@ -2,6 +2,7 @@ const createError = require('http-errors');
 
 const Campaign = require('../models/Campaign');
 const Advertiser = require('../models/Advertiser');
+const User = require('../models/User');
 const UserStats = require('../models/UserStats');
 const UserByAge = require('../models/UserByAge');
 const getRandomIntInclusive = require('../utils');
@@ -10,30 +11,13 @@ const { campaignResponseMessage } = require('../constants/responseMessage');
 
 exports.createCampaign = async function (req, res, next) {
   try {
-    const {
-      title,
-      campaignType,
-      expiresType,
-      content,
-      expiresAt,
-      dailyBudget,
-      campaignUrl
-    } = req.body;
-    const remainingBudget = dailyBudget;
-
     const newCampaign = await Campaign.create({
-      title,
-      campaignType,
-      expiresType,
-      content,
-      expiresAt,
-      dailyBudget,
-      remainingBudget,
-      campaignUrl,
+      ...req.body,
+      remainingBudget: req.body.dailyBudget,
     });
 
     await Advertiser.findByIdAndUpdate(
-      req.advertiserId,
+      req.id,
       { $addToSet: { campaigns: newCampaign._id } }
     );
 
@@ -52,7 +36,7 @@ exports.createCampaign = async function (req, res, next) {
 exports.getAdvertiserCampaigns = async function (req, res, next) {
   try {
     const advertiser = await Advertiser
-      .findById(req.advertiserId)
+      .findById(req.id)
       .populate('campaigns')
       .lean();
 
@@ -77,7 +61,7 @@ exports.getCampaignPopUp = async function (req, res, next) {
     const randomCost = getRandomIntInclusive(100, 1000);
     const openedCampaigns = await Campaign.find({
       status: 'opened',
-      remainingBudget: { $gte: randomCost, },
+      remainingBudget: { $gte: randomCost },
     }).lean();
 
     if (!openedCampaigns.length) {
@@ -117,11 +101,12 @@ exports.getCampaignPopUp = async function (req, res, next) {
 exports.updateCampaignStats = async function (req, res, next) {
   try {
     const { campaignId, type } = req.body;
+    const currentUser = await User.findById(req.id);
 
     if (type === 'reach') {
-      await Campaign.addReachCount(campaignId);
+      await Campaign.addReachCount(campaignId, currentUser);
     } else if (type === 'click') {
-      await Campaign.addClickCount(campaignId);
+      await Campaign.addClickCount(campaignId, currentUser);
     }
 
     res.json({
