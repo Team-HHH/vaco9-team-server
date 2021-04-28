@@ -1,22 +1,19 @@
 const mongoose = require('mongoose');
 
-const statsSchema = new mongoose.Schema({
+const userByAgeSchema = new mongoose.Schema({
   country: {
     type: String,
     trim: true,
     unique: true,
-    index: true,
     required: true,
   },
   age: {
     type: Number,
-    index: true,
     required: true,
   },
   gender: {
     type: String,
     enum: ['male', 'female'],
-    index: true,
     required: true,
   },
   reach: {
@@ -41,12 +38,12 @@ const statsSchema = new mongoose.Schema({
   },
 });
 
-statsSchema.virtual('cpm').get(function() {
-  return this.usedBudget / this.reach * 1000 ;
+userByAgeSchema.virtual('cpmcpmcpm').get(function() {
+  return this.usedBudget / this.reach * 1000;
 });
 
-statsSchema.virtual('cpc').get(function() {
-  return this.usedBudget / this.click ;
+userByAgeSchema.virtual('cpccpccpc').get(function() {
+  return this.usedBudget / this.click;
 });
 
-module.exports = mongoose.model('UserByAge', statsSchema);
+module.exports = mongoose.model('UserByAge', userByAgeSchema);

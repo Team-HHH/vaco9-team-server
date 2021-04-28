@@ -3,6 +3,7 @@ const createError = require('http-errors');
 const Campaign = require('../models/Campaign');
 const Advertiser = require('../models/Advertiser');
 const UserStats = require('../models/UserStats');
+const UserByAge = require('../models/UserByAge');
 const getRandomIntInclusive = require('../utils');
 const { campaignErrorMessage } = require('../constants/controllerErrorMessage');
 const { campaignResponseMessage } = require('../constants/responseMessage');
@@ -135,33 +136,25 @@ exports.updateCampaignStats = async function (req, res, next) {
 exports.getEstimateStats = async function (req, res, next) {
   try {
     const { minAge, maxAge, gender, country } = req.body;
-    console.log(minAge)
-    console.log(maxAge)
-    console.log(gender)
-    console.log(country)
 
-    const targets = await UserStats.aggregate([
-      {
-        $match: {
-          country,
-          'stats.age': {
-            $lte: minAge,
-            $gte: maxAge,
-          },
-          'stats.gender': gender === 'both' ? { $or: ['male', 'female'] } : gender }
-      }
-    ]);
-
-    console.log(targets);
+    const targets = await UserByAge.find({
+      country,
+      'age': {
+        $lte: Number(maxAge),
+        $gte: Number(minAge),
+      },
+      'gender': gender === 'both' ? { $or: ['male', 'female'] } : gender,
+    });
 
     const { cpm, cpc } = targets.reduce((acc, cur) => {
-      acc.cpm += cur.cpm;
-      acc.cpc += cur.cpc;
+      acc.cpm += (cur.usedBudget / cur.reach * 1000);
+      acc.cpc += (cur.usedBudget / cur.click);
+      return acc;
     }, {'cpm': 0, 'cpc': 0});
 
     res.json({
-      cpm,
-      cpc
+      cpm: cpm / targets.length,
+      cpc: cpc / targets.length,
     });
   } catch (error) {
     next(createError(500, error));
