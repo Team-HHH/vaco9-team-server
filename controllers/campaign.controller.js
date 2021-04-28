@@ -2,6 +2,7 @@ const createError = require('http-errors');
 
 const Campaign = require('../models/Campaign');
 const Advertiser = require('../models/Advertiser');
+const UserStats = require('../models/UserStats');
 const getRandomIntInclusive = require('../utils');
 const { campaignErrorMessage } = require('../constants/controllerErrorMessage');
 const { campaignResponseMessage } = require('../constants/responseMessage');
@@ -126,6 +127,25 @@ exports.updateCampaignStats = async function (req, res, next) {
       code: 200,
       message: campaignResponseMessage.UPDATE_CAMPAIGN_STATS_SUCCESS,
     });
+  } catch (error) {
+    next(createError(500, error));
+  }
+};
+
+exports.getEstimateStats = async function (req, res, next) {
+  try {
+    const { minAge, maxAge, gender, country } = req.body;
+
+    const targets = UserStats.find({
+      country,
+      'stats.age': {
+        $lte: minAge,
+        $gte: maxAge,
+      },
+      'stats.gender': gender === 'both' ? { $or: ['male', 'female'] } : gender,
+    }).lean();
+
+
   } catch (error) {
     next(createError(500, error));
   }
