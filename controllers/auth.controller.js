@@ -1,14 +1,12 @@
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
+
 const Advertiser = require('../models/Advertiser');
 const User = require('../models/User');
-
-const {
-  authErrorMessage,
-  ACCESS_TOKEN_EXPIRATION_TIME
-} = require('../constants/controllerErrorMessage');
+const { authErrorMessage } = require('../constants/controllerErrorMessage');
 const { authResponseMessage } = require('../constants/responseMessage');
+const { ACCESS_TOKEN_EXPIRATION_TIME } = require('../constants');
 
 exports.register = async function (req, res, next) {
   try {

@@ -1,8 +1,8 @@
 const createError = require('http-errors');
 const axios = require('axios');
 const { differenceInCalendarDays } = require('date-fns');
-const Campaign = require('../models/Campaign');
 
+const Campaign = require('../models/Campaign');
 const { paymentErrorMessage } = require('../constants/controllerErrorMessage');
 
 exports.verifyPayment = async function (req, res, next) {

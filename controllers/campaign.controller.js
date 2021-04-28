@@ -1,8 +1,8 @@
 const createError = require('http-errors');
+
 const Campaign = require('../models/Campaign');
 const Advertiser = require('../models/Advertiser');
 const getRandomIntInclusive = require('../utils');
-
 const { campaignErrorMessage } = require('../constants/controllerErrorMessage');
 const { campaignResponseMessage } = require('../constants/responseMessage');
 
