@@ -55,7 +55,7 @@ exports.getAdvertiserCampaigns = async function (req, res, next) {
       .lean();
 
     if (!advertiser) {
-      return next(createError(400), campaignErrorMessage.NONEXISTENT_ADVERTISER_ERROR);
+      return next(createError(400, campaignErrorMessage.NONEXISTENT_ADVERTISER_ERROR));
     }
 
     res.json({

@@ -2,6 +2,7 @@ const Joi = require('joi');
 const {
   commonErrorMessage,
   advertiserRegisterErrorMessage,
+  userRegisterErrorMessage,
   createCampaignErrorMessage,
   paymentErrorMessage,
   campaignStatsErrorMessage,
@@ -65,6 +66,15 @@ exports.userRegisterValidation = function (req, res, next) {
       .valid(Joi.ref('password'))
       .required()
       .error(new Error(commonErrorMessage.INVALID_PASSWORDCONFIRM)),
+    age: Joi.string()
+      .required()
+      .error(new Error(userRegisterErrorMessage.INVALID_AGE)),
+    gender: Joi.string()
+      .required()
+      .error(new Error(userRegisterErrorMessage.INVALID_GENDER)),
+    country: Joi.string()
+      .required()
+      .error(new Error(userRegisterErrorMessage.INVALID_COUNTRY)),
   });
 
   validateRequest(req, res, next, schema);

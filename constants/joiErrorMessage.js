@@ -11,6 +11,12 @@ exports.advertiserRegisterErrorMessage = Object.freeze({
   INVALID_COMPANYREGISTRATIONNUMBER: 'Company registration number is invalid',
 });
 
+exports.userRegisterErrorMessage = Object.freeze({
+  INVALID_AGE: 'Age is invalid',
+  INVALID_GENDER: 'Gender is invalid',
+  INVALID_COUNTRY: 'Country is invalid',
+});
+
 exports.createCampaignErrorMessage = Object.freeze({
   INVALID_TITLE: 'Title is invalid',
   INVALID_CAMPAIGNTYPE: 'Campaign type must be [banner, text, video]',
