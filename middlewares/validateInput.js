@@ -15,7 +15,7 @@ exports.advertiserRegisterValidation = function (req, res, next) {
       .error(new Error(commonErrorMessage.INVALID_EMAIL)),
     name: Joi.string()
       .required()
-      .error(new Error(advertiserRegisterErrorMessage.INVALID_NAME)),
+      .error(new Error(commonErrorMessage.INVALID_NAME)),
     password: Joi.string()
       .min(8)
       .max(20)
@@ -27,7 +27,7 @@ exports.advertiserRegisterValidation = function (req, res, next) {
       .max(20)
       .valid(Joi.ref('password'))
       .required()
-      .error(new Error(advertiserRegisterErrorMessage.INVALID_PASSWORDCONFIRM)),
+      .error(new Error(commonErrorMessage.INVALID_PASSWORDCONFIRM)),
     companyName: Joi.string()
       .required()
       .error(new Error(advertiserRegisterErrorMessage.INVALID_COMPANYNAME)),
@@ -44,7 +44,33 @@ exports.advertiserRegisterValidation = function (req, res, next) {
   validateRequest(req, res, next, schema);
 };
 
-exports.advertiserLoginValidation = function (req, res, next) {
+exports.userRegisterValidation = function (req, res, next) {
+  const schema = Joi.object({
+    email: Joi.string()
+      .email()
+      .required()
+      .error(new Error(commonErrorMessage.INVALID_EMAIL)),
+    name: Joi.string()
+      .required()
+      .error(new Error(commonErrorMessage.INVALID_NAME)),
+    password: Joi.string()
+      .min(8)
+      .max(20)
+      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])'))
+      .required()
+      .error(new Error(commonErrorMessage.INVALID_PASSWORD)),
+    passwordConfirm: Joi.string()
+      .min(8)
+      .max(20)
+      .valid(Joi.ref('password'))
+      .required()
+      .error(new Error(commonErrorMessage.INVALID_PASSWORDCONFIRM)),
+  });
+
+  validateRequest(req, res, next, schema);
+};
+
+exports.loginValidation = function (req, res, next) {
   const schema = Joi.object({
     email: Joi.string()
       .email()
@@ -130,7 +156,7 @@ async function validateRequest(req, res, next, schema) {
 
     next();
   } catch (error) {
-    res.json({
+    res.status(400).json({
       code: 400,
       message: error.message,
     });

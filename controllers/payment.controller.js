@@ -3,6 +3,8 @@ const axios = require('axios');
 const { differenceInCalendarDays } = require('date-fns');
 const Campaign = require('../models/Campaign');
 
+const { paymentErrorMessage } = require('../constants/controllerErrorMessage');
+
 exports.verifyPayment = async function (req, res, next) {
   try {
     const { imp_uid, merchant_uid } = req.body;
@@ -11,20 +13,20 @@ exports.verifyPayment = async function (req, res, next) {
     const amountToBePaid = currentCampaign.dailyBudget * campaignDuration;
 
     const getToken = await axios({
-      url: 'https://api.iamport.kr/users/getToken',
+      url: process.env.IAMPORT_TOKEN_URL,
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       data: {
-        imp_key: process.env.IMPORT_REST_API,
-        imp_secret: process.env.IMPORT_REST_API_SECRET,
+        imp_key: process.env.IAMPORT_REST_API,
+        imp_secret: process.env.IAMPORT_REST_API_SECRET,
       },
     });
 
     const { access_token } = getToken.data.response;
 
     const getPaymentData = await axios({
-      url: `https://api.iamport.kr/payments/${imp_uid}`,
-      method: 'GET',
+      url: process.env.IAMPORT_PAYMENTS_URL + `${imp_uid}`,
+      method: 'get',
       headers: { 'Authorization': access_token },
     });
 
@@ -41,7 +43,7 @@ exports.verifyPayment = async function (req, res, next) {
         });
       }
     } else {
-      next(createError(400));
+      next(createError(400, paymentErrorMessage.FAILED_TO_PAY_ERROR));
     }
   } catch (err) {
     next(createError(500, err));
