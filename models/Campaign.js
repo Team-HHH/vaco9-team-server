@@ -155,11 +155,11 @@ campaignSchema.statics.addReachCount = async function (id, user) {
     },
     {
       $inc: { 'stats.$.reach': 1 },
-      $push: {
+      $push: { reachExposed: {
         age: user.age,
         gender: user.gender,
         country: user.country,
-      }
+      }}
     }
   );
 };
@@ -179,11 +179,11 @@ campaignSchema.statics.addClickCount = async function (id, user) {
     },
     {
       $inc: { 'stats.$.click': 1 },
-      $push: {
+      $push: { clickExposed: {
         age: user.age,
         gender: user.gender,
         country: user.country,
-      }
+      }}
     }
   );
 };
