@@ -140,7 +140,7 @@ campaignSchema.statics.addStatsIfDoesNotExist = async function (id, date) {
   }
 };
 
-campaignSchema.statics.addReachCount = async function (id, user) {
+campaignSchema.statics.addReachCount = async function (id, user, cost) {
   const today = new Date();
 
   await this.addStatsIfDoesNotExist(id, today);
@@ -154,7 +154,7 @@ campaignSchema.statics.addReachCount = async function (id, user) {
       }
     },
     {
-      $inc: { 'stats.$.reach': 1 },
+      $inc: { 'stats.$.reach': 1, 'stats.$.usedBudget': cost, remainingBudget: -cost },
       $push: { reachExposed: {
         age: user.age,
         gender: user.gender,
@@ -164,7 +164,7 @@ campaignSchema.statics.addReachCount = async function (id, user) {
   );
 };
 
-campaignSchema.statics.addClickCount = async function (id, user) {
+campaignSchema.statics.addClickCount = async function (id, user, cost) {
   const today = new Date();
 
   await this.addStatsIfDoesNotExist(id, today);
@@ -178,7 +178,7 @@ campaignSchema.statics.addClickCount = async function (id, user) {
       }
     },
     {
-      $inc: { 'stats.$.click': 1 },
+      $inc: { 'stats.$.click': 1, 'stats.$.usedBudget': cost, remainingBudget: -cost },
       $push: { clickExposed: {
         age: user.age,
         gender: user.gender,

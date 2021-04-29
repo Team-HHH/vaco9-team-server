@@ -1,11 +1,11 @@
 const createError = require('http-errors');
+const _ = require('lodash');
 
 const Campaign = require('../models/Campaign');
 const Advertiser = require('../models/Advertiser');
 const User = require('../models/User');
 const UserStats = require('../models/UserStats');
 const UserByAge = require('../models/UserByAge');
-const { getRandomIntInclusive, range } = require('../utils');
 const { campaignErrorMessage } = require('../constants/controllerErrorMessage');
 const { campaignResponseMessage } = require('../constants/responseMessage');
 
@@ -27,7 +27,7 @@ exports.createCampaign = async function (req, res, next) {
       $inc: { countryTargetedCount: 1 }
     });
 
-    const promises = range(req.body.minAge, req.body.maxAge).map(age => {
+    const promises = _.range(req.body.minAge, req.body.maxAge).map(age => {
       return UserByAge.findOneAndUpdate({
         country: req.body.country,
         age: age,
@@ -83,7 +83,7 @@ exports.getCampaignPopUp = async function (req, res, next) {
       gender: { $in: [currentUser.gender, 'both'] },
       minAge: { $lte: currentUser.age },
       maxAge: { $gte: currentUser.age },
-      remainingBudget: { $gte: randomCost },
+      remainingBudget: { $gte: 0 },
     }).lean();
 
     if (!openedCampaigns.length) {
@@ -117,40 +117,44 @@ exports.updateCampaignStats = async function (req, res, next) {
   try {
     const { campaignId, type } = req.body;
     const currentUser = await User.findById(req.id);
+    const targetAge = await UserByAge.find({
+      country: currentUser.country,
+      age: currentUser.age,
+      gender: currentUser.gender,
+    });
+    const targetCountry = await UserStats.find({
+      country: currentUser.country,
+    });
+    let reachCost = 0;
 
-
-    const randomCost = getRandomIntInclusive(100, 1000);
-
-    await Campaign.findByIdAndUpdate(
-      pickedCampaign._id,
-      { 
-        $inc: { remainingBudget: -randomCost }
-      }
-    );
-
-
+    if ((targetAge.targetedCount / targetCountry.countryTargetedCount) > 0.04) {
+      reachCost = targetAge.basicReachPrice * 1.2;
+    } else if ((targetAge.targetedCount / targetCountry.countryTargetedCount) > 0.02) {
+      reachCost = targetAge.basicReachPrice * 1.1;
+    } else if ((targetAge.targetedCount / targetCountry.countryTargetedCount) < 0.01) {
+      reachCost = targetAge.basicReachPrice * 0.9;
+    } else {
+      reachCost = targetAge.basicReachPrice;
+    }
 
     if (type === 'reach') {
-      const targetAge = await UserByAge.findOneAndUpdate({
+      await UserByAge.findOneAndUpdate({
         country: currentUser.country,
         age: currentUser.age,
         gender: currentUser.gender,
       }, {
-        $inc: { reach: 1 },
+        $inc: { reach: 1, usedBudget: reachCost },
       });
-
-      const reachCost = targetAge.basicReachPrice * random(0.8, 1.2);
-
-      await Campaign.addReachCount(campaignId, currentUser);
+      await Campaign.addReachCount(campaignId, currentUser, reachCost);
     } else if (type === 'click') {
       await UserByAge.findOneAndUpdate({
         country: currentUser.country,
         age: currentUser.age,
         gender: currentUser.gender,
       }, {
-        $inc: { click: 1 },
+        $inc: { click: 1, usedBudget: reachCost },
       });
-      await Campaign.addClickCount(campaignId, currentUser);
+      await Campaign.addClickCount(campaignId, currentUser, reachCost);
     }
 
     res.json({
@@ -168,11 +172,11 @@ exports.getEstimateStats = async function (req, res, next) {
 
     const targets = await UserByAge.find({
       country: { $in: [...country] },
-      'age': {
+      age: {
         $lte: Number(maxAge),
         $gte: Number(minAge),
       },
-      'gender': gender === 'both' ? { $or: ['male', 'female'] } : gender,
+      gender: gender === 'both' ? { $or: ['male', 'female'] } : gender,
     });
 
     const { cpm, cpc, userCount, ctr } = targets.reduce((acc, cur) => {
