@@ -23,6 +23,20 @@ const userSchema = new mongoose.Schema({
     trim: true,
     enum: [''],
   },
+  age: {
+    type: Number,
+    required: true,
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female'],
+    required: true,
+  },
+  country: {
+    type: String,
+    trim: true,
+    required: true,
+  },
 });
 
 userSchema.statics.checkIsUserExist =  function ({ email }) {

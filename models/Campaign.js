@@ -53,6 +53,24 @@ const campaignSchema = new mongoose.Schema({
     enum: ['card', 'trans', 'phone'],
     default: 'card',
   },
+  country: {
+    type: String,
+    trim: true,
+    required: true,
+  },
+  minAge: {
+    type: Number,
+    required: true,
+  },
+  maxAge: {
+    type: Number,
+    required: true,
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female'],
+    required: true,
+  },
   stats: [{
     date: {
       type: Date,
@@ -69,6 +87,38 @@ const campaignSchema = new mongoose.Schema({
     usedBudget: {
       type: Number,
       default: 0,
+    },
+  }],
+  reachExposed: [{
+    age: {
+      type: Number,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female'],
+      required: true,
+    },
+    country: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+  }],
+  clickExposed: [{
+    age: {
+      type: Number,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female'],
+      required: true,
+    },
+    country: {
+      type: String,
+      trim: true,
+      required: true,
     },
   }],
 });
@@ -90,7 +140,7 @@ campaignSchema.statics.addStatsIfDoesNotExist = async function (id, date) {
   }
 };
 
-campaignSchema.statics.addReachCount = async function (id) {
+campaignSchema.statics.addReachCount = async function (id, user) {
   const today = new Date();
 
   await this.addStatsIfDoesNotExist(id, today);
@@ -103,11 +153,18 @@ campaignSchema.statics.addReachCount = async function (id) {
         $lte: endOfDay(today)
       }
     },
-    { $inc: { 'stats.$.reach': 1 } }
+    {
+      $inc: { 'stats.$.reach': 1 },
+      $push: {
+        age: user.age,
+        gender: user.gender,
+        country: user.country,
+      }
+    }
   );
 };
 
-campaignSchema.statics.addClickCount = async function (id) {
+campaignSchema.statics.addClickCount = async function (id, user) {
   const today = new Date();
 
   await this.addStatsIfDoesNotExist(id, today);
@@ -120,13 +177,15 @@ campaignSchema.statics.addClickCount = async function (id) {
         $lte: endOfDay(today)
       }
     },
-    { $inc: { 'stats.$.click': 1 } }
+    {
+      $inc: { 'stats.$.click': 1 },
+      $push: {
+        age: user.age,
+        gender: user.gender,
+        country: user.country,
+      }
+    }
   );
 };
-
-campaignSchema.pre('save', function (next) {
-  this.remainingBudget = this.get('dailyBudget');
-  next();
-});
 
 module.exports = mongoose.model('Campaign', campaignSchema);
