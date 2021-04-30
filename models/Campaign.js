@@ -53,11 +53,11 @@ const campaignSchema = new mongoose.Schema({
     enum: ['card', 'trans', 'phone'],
     default: 'card',
   },
-  country: {
+  country: [{
     type: String,
     trim: true,
     required: true,
-  },
+  }],
   minAge: {
     type: Number,
     required: true,

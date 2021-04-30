@@ -13,6 +13,7 @@ exports.createCampaign = async function (req, res, next) {
   try {
     const newCampaign = await Campaign.create({
       ...req.body,
+      campaignUrl: `http://${req.body.campaignUrl}`,
       remainingBudget: req.body.dailyBudget,
     });
 
