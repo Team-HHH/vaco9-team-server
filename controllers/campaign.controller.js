@@ -118,12 +118,12 @@ exports.updateCampaignStats = async function (req, res, next) {
   try {
     const { campaignId, type } = req.body;
     const currentUser = await User.findById(req.id);
-    const targetAge = await UserByAge.find({
+    const targetAge = await UserByAge.findOne({
       country: currentUser.country,
       age: currentUser.age,
       gender: currentUser.gender,
     });
-    const targetCountry = await UserStats.find({
+    const targetCountry = await UserStats.findOne({
       country: currentUser.country,
     });
     let reachCost = 0;
@@ -153,7 +153,7 @@ exports.updateCampaignStats = async function (req, res, next) {
         age: currentUser.age,
         gender: currentUser.gender,
       }, {
-        $inc: { click: 1, usedBudget: reachCost },
+        $inc: { click: 1 },
       });
       await Campaign.addClickCount(campaignId, currentUser, reachCost);
     }
@@ -172,7 +172,7 @@ exports.getEstimateStats = async function (req, res, next) {
     const { minAge, maxAge, gender, country } = req.body;
 
     const targets = await UserByAge.find({
-      country: { $in: [...country] },
+      country,
       age: {
         $lte: Number(maxAge),
         $gte: Number(minAge),

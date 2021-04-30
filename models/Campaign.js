@@ -127,7 +127,7 @@ campaignSchema.statics.addStatsIfDoesNotExist = async function (id, date) {
   if (!isTodayStatsExist) {
     return this.findByIdAndUpdate(
       id,
-      { $addToSet: { stats: { date: date } } }
+      { $addToSet: { stats: { date: startOfDay(date) } } }
     );
   }
 };
