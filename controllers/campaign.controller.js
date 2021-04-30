@@ -11,8 +11,11 @@ const { campaignResponseMessage } = require('../constants/responseMessage');
 
 exports.createCampaign = async function (req, res, next) {
   try {
+    const countries = req.body.country.map(country => country.value);
     const newCampaign = await Campaign.create({
       ...req.body,
+      country: countries,
+      campaignUrl: `http://${req.body.campaignUrl}`,
       remainingBudget: req.body.dailyBudget,
     });
 
@@ -21,23 +24,19 @@ exports.createCampaign = async function (req, res, next) {
       { $addToSet: { campaigns: newCampaign._id } }
     );
 
-    await UserStats.findOneAndUpdate({
-      country: req.body.country,
-    }, {
-      $inc: { countryTargetedCount: 1 }
-    });
+    await UserStats.updateMany(
+      { country: { $in: [...countries] } },
+      { $inc: { countryTargetedCount: req.body.maxAge - req.body.minAge + 1 } }
+    );
 
-    const promises = _.range(req.body.minAge, req.body.maxAge).map(age => {
-      return UserByAge.findOneAndUpdate({
-        country: req.body.country,
-        age: age,
-        gender: req.body.gender,
-      }, {
-        $inc: { targetedCount: 1 },
-      });
-    });
-
-    await Promise.all(promises);
+    await UserByAge.updateMany(
+      {
+        age: { $gte: Number(req.body.minAge), $lte: Number(req.body.maxAge) },
+        country: { $in: [...countries] },
+        gender: req.body.gender === 'both' ? { $in: ['male', 'female'] } : req.body.gender,
+      },
+      { $inc: { targetedCount: 1 } }
+    );
 
     res.json({
       code: 200,
@@ -117,12 +116,12 @@ exports.updateCampaignStats = async function (req, res, next) {
   try {
     const { campaignId, type } = req.body;
     const currentUser = await User.findById(req.id);
-    const targetAge = await UserByAge.find({
+    const targetAge = await UserByAge.findOne({
       country: currentUser.country,
       age: currentUser.age,
       gender: currentUser.gender,
     });
-    const targetCountry = await UserStats.find({
+    const targetCountry = await UserStats.findOne({
       country: currentUser.country,
     });
     let reachCost = 0;
@@ -152,7 +151,7 @@ exports.updateCampaignStats = async function (req, res, next) {
         age: currentUser.age,
         gender: currentUser.gender,
       }, {
-        $inc: { click: 1, usedBudget: reachCost },
+        $inc: { click: 1 },
       });
       await Campaign.addClickCount(campaignId, currentUser, reachCost);
     }
@@ -169,9 +168,10 @@ exports.updateCampaignStats = async function (req, res, next) {
 exports.getEstimateStats = async function (req, res, next) {
   try {
     const { minAge, maxAge, gender, country } = req.body;
+    const countries = country.map(country => country.value);
 
     const targets = await UserByAge.find({
-      country: { $in: [...country] },
+      country: { $in: [...countries] },
       age: {
         $lte: Number(maxAge),
         $gte: Number(minAge),

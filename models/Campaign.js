@@ -53,11 +53,11 @@ const campaignSchema = new mongoose.Schema({
     enum: ['card', 'trans', 'phone'],
     default: 'card',
   },
-  country: {
+  country: [{
     type: String,
     trim: true,
     required: true,
-  },
+  }],
   minAge: {
     type: Number,
     required: true,
@@ -127,7 +127,7 @@ campaignSchema.statics.addStatsIfDoesNotExist = async function (id, date) {
   if (!isTodayStatsExist) {
     return this.findByIdAndUpdate(
       id,
-      { $addToSet: { stats: { date: date } } }
+      { $addToSet: { stats: { date: startOfDay(date) } } }
     );
   }
 };
