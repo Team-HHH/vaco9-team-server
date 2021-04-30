@@ -26,6 +26,10 @@ const userByAgeSchema = new mongoose.Schema({
     default: 0,
     required: true,
   },
+  basicReachPrice: {
+    type: Number,
+    required: true,
+  },
   usedBudget: {
     type: Number,
     default: 0,
