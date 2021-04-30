@@ -167,7 +167,6 @@ exports.updateCampaignStats = async function (req, res, next) {
 
 exports.getEstimateStats = async function (req, res, next) {
   try {
-    console.log(req.body)
     const { minAge, maxAge, gender, country } = req.body;
     const countries = country.map(country => country.value);
 
