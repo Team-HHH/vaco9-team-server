@@ -53,6 +53,24 @@ const campaignSchema = new mongoose.Schema({
     enum: ['card', 'trans', 'phone'],
     default: 'card',
   },
+  country: [{
+    type: String,
+    trim: true,
+    required: true,
+  }],
+  minAge: {
+    type: Number,
+    required: true,
+  },
+  maxAge: {
+    type: Number,
+    required: true,
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female'],
+    required: true,
+  },
   stats: [{
     date: {
       type: Date,
@@ -71,6 +89,30 @@ const campaignSchema = new mongoose.Schema({
       default: 0,
     },
   }],
+  exposed: [{
+    reach: {
+      type: Number,
+      default: 0,
+    },
+    click: {
+      type: Number,
+      default: 0,
+    },
+    age: {
+      type: Number,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female'],
+      required: true,
+    },
+    country: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+  }],
 });
 
 campaignSchema.statics.addStatsIfDoesNotExist = async function (id, date) {
@@ -85,17 +127,52 @@ campaignSchema.statics.addStatsIfDoesNotExist = async function (id, date) {
   if (!isTodayStatsExist) {
     return this.findByIdAndUpdate(
       id,
-      { $addToSet: { stats: { date: date } } }
+      { $addToSet: { stats: { date: startOfDay(date) } } }
     );
   }
 };
 
-campaignSchema.statics.addReachCount = async function (id) {
+campaignSchema.statics.addExposedIfDoesNotExist = async function (id, age, gender, country) {
+  const isTodayExposedExist = await this.exists(
+    {
+      _id: id,
+      'exposed.age': age,
+      'exposed.gender': gender,
+      'exposed.country': country,
+    }
+  );
+
+  if (!isTodayExposedExist) {
+    return this.findByIdAndUpdate(
+      id,
+      { $addToSet: { exposed: {
+        age,
+        gender,
+        country,
+      }}}
+    );
+  }
+};
+
+campaignSchema.statics.addReachCount = async function (id, user, cost) {
   const today = new Date();
 
   await this.addStatsIfDoesNotExist(id, today);
+  await this.addExposedIfDoesNotExist(id, user.age, user.gender, user.country);
 
-  return this.findOneAndUpdate(
+  await this.findOneAndUpdate(
+    {
+      _id: id,
+      'exposed.age': user.age,
+      'exposed.gender': user.gender,
+      'exposed.country': user.country,
+    },
+    {
+      $inc: { 'exposed.$.reach': 1 }
+    }
+  );
+
+  await this.findOneAndUpdate(
     {
       _id: id,
       'stats.date': {
@@ -103,16 +180,31 @@ campaignSchema.statics.addReachCount = async function (id) {
         $lte: endOfDay(today)
       }
     },
-    { $inc: { 'stats.$.reach': 1 } }
+    {
+      $inc: { 'stats.$.reach': 1, 'stats.$.usedBudget': cost, remainingBudget: -cost }
+    }
   );
 };
 
-campaignSchema.statics.addClickCount = async function (id) {
+campaignSchema.statics.addClickCount = async function (id, user, cost) {
   const today = new Date();
 
   await this.addStatsIfDoesNotExist(id, today);
+  await this.addExposedIfDoesNotExist(id, user.age, user.gender, user.country);
 
-  return this.findOneAndUpdate(
+  await this.findOneAndUpdate(
+    {
+      _id: id,
+      'exposed.age': user.age,
+      'exposed.gender': user.gender,
+      'exposed.country': user.country,
+    },
+    {
+      $inc: { 'exposed.$.click': 1 }
+    }
+  );
+
+  await this.findOneAndUpdate(
     {
       _id: id,
       'stats.date': {
@@ -120,13 +212,10 @@ campaignSchema.statics.addClickCount = async function (id) {
         $lte: endOfDay(today)
       }
     },
-    { $inc: { 'stats.$.click': 1 } }
+    {
+      $inc: { 'stats.$.click': 1, 'stats.$.usedBudget': cost, remainingBudget: -cost }
+    }
   );
 };
-
-campaignSchema.pre('save', function (next) {
-  this.remainingBudget = this.get('dailyBudget');
-  next();
-});
 
 module.exports = mongoose.model('Campaign', campaignSchema);

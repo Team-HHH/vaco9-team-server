@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 
-exports.verifyAdvertiser = async function (req, res, next) {
+exports.verifyToken = async function (req, res, next) {
   try {
     await jwt.verify(
       req.headers.authorization,
@@ -11,7 +11,7 @@ exports.verifyAdvertiser = async function (req, res, next) {
           return next(createError(401, err));
         }
 
-        req.advertiserId = decoded.id;
+        req.id = decoded.id;
 
         next();
       }

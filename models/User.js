@@ -18,10 +18,19 @@ const userSchema = new mongoose.Schema({
     trim: true,
     required: true,
   },
-  paymentState: {
+  age: {
+    type: Number,
+    required: true,
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female'],
+    required: true,
+  },
+  country: {
     type: String,
     trim: true,
-    enum: [''],
+    required: true,
   },
 });
 
